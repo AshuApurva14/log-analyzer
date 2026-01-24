@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+# SCRIPT_NAME
+#
+# Description: A brief description of what the script does.
+#
+# Usage: ./script_name.sh [OPTIONS]
+#
+# Options:
+#   -h, --help    Display this help message and exit.
+#   --dry-run     Run the script in dry-run mode (if applicable).
+#
+#
+# Exit codes:
+#   0 - Success
+#   1 - Error
+#
+
+# --- Configuration and Error Handling ---
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
+# Treat unset variables as an error when substituting.
+set -u
+# If any command in a pipeline fails, the whole pipeline fails.
+set -o pipefail
+
+# Optional: Display executed commands while running for debugging.
+# set -x
+
+# Function to display a message to stderr
+msg() {
+    echo >&2 -e "${1-}"
+}
+
+# Function to display error message and exit
+die() {
+    local msg=$1
+    local code=${2-1} # Default exit status 1
+    msg "$msg"
+    exit "$code"
+}
+
+# Cleanup function to be executed on exit (e.g., remove temporary files)
+cleanup() {
+    trap - SIGINT SIGTERM ERR EXIT # Restore default signal handlers
+    # Add your cleanup commands here, e.g., rm -rf /tmp/myscript.lock
+}
+
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+# Function to display usage and help
+usage() {
+    cat <<EOF
+Usage: ./$(basename "$0") [OPTIONS]
+
+A brief description of what this script does.
+
+Options:
+  -h, --help    Display this help message and exit.
+  --dry-run     Run the script in dry-run mode.
+EOF
+    exit 0
+}
+
+# Function to parse command-line parameters (basic example)
+parse_params() {
+    while :; do
+        case "${1-}" in
+        -h | --help) usage ;;
+        *) break ;;
+        esac
+        shift
+    done
+    
+    # Check for required arguments if needed
+    # [[ $# -eq 0 ]] && die "Missing script arguments. Use -h for help."
+
+    return 0
+}
+
+# --- Main Script Logic ---
+
+parse_params "$@"
+
+# Your main script commands go here
+msg "Script is running..."
+# Example command
+echo "Hello, robust shell script!"
+# Example of using error handling:
+# non_existent_command # This would trigger the 'set -e' and the trap handler
+
+msg "Finished successfully."
+
