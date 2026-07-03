@@ -1,7 +1,0 @@
-# echo Command usages
-
-my_Var=10
-
-echo $my_Var
-echo ${my_Var}
-echo "${my_Var}"
